@@ -26,18 +26,15 @@ public class Station implements Iterable<Station> {
 
     public void parseNearStations(){
         for(String station : nearStations){
-            double dist=0.0;
             for(Station s : allStations){
                 if(s.getName().equals(station)) {
-                    dist = getDistance(this, s);
                     break;
                 }
             }
-            nearStations.add(station);
         }
     }
 
-    public Station(String name, String napr, int zone, int platformCount, double X, double Y, String prev, String next, String[] Rnear, Station Mnear){
+    public Station(String name, String napr, int zone, int platformCount, double X, double Y, String prev, String next, String Rnear, Station Mnear){
         this.name=name;
         this.napr = napr;
         this.tariffZone = zone;
@@ -46,8 +43,10 @@ public class Station implements Iterable<Station> {
         this.coord_Y=Y;
         this.prevStation = (prev!=null)?new Station(prev):getNullStation();
         this.nextStation = (next!=null)?new Station(next):getNullStation();
-        if(Rnear!=null)
-            for(String station : Rnear){
+        String[] rnear = {""};
+        if(!Rnear.equals("null"))
+            rnear = Rnear.split(",");
+            for(String station : rnear){
                 nearStations.add(station);
             }
         allStations.add(this);
@@ -61,7 +60,7 @@ public class Station implements Iterable<Station> {
         for(Station rs : allStations){
             Station.getKey(rs).setNext(rs.getNextStation());
             Station.getKey(rs).setPrev(rs.getPrevStation());
-            //Station.getKey(rs).setNear(rs.getNearStations());
+            Station.getKey(rs).setNear(rs.getNearStations());
         }
     }
 
@@ -79,19 +78,15 @@ public class Station implements Iterable<Station> {
         return (prevStation!=null)? prevStation:getNullStation();
     }
 
-    /*public String getNearStations(){
+//    public ArrayList<Station> getNearStations(){
+//        return nearStations;
+//    }
+    public String getNearStations(){
         String s="";
-        for(HashMap.Entry<String, Double> station : nearStations.entrySet()){
-            s+="\t"+station.getKey()+": "+station.getValue()+" м\n";
+        for(String st : nearStations){
+            s+="\t"+st+"\n";
         }
         return s;
-    }*/
-    public ArrayList<Station> getNearStations(){
-        ArrayList<Station> al = new ArrayList<>();
-        for(String station : nearStations){
-            al.add(new Station(station));
-        }
-        return al;
     }
 
     public String toString() {
@@ -106,7 +101,7 @@ public class Station implements Iterable<Station> {
             s += "Следующая станция: " + this.getNextStation().getName() + "\n";
             s += "Предыдущая станция: " + this.getPrevStation().getName() + "\n";
             s += "Координаты: \n\tx=" + this.getCoord_X() + "\n\ty=" + this.getCoord_Y() + "\n";
-            if (!this.getNearStations().equals(""))
+            if (!(this.nearStations.get(0)==""))
                 s += "Пересадка на станции:\n" + this.getNearStations();
             // if (!this.getNearMetroStation().equals(""))
             //     s+= "Ближайшая станция метро:\n" + this.getNearMetroStation();
@@ -194,8 +189,8 @@ public class Station implements Iterable<Station> {
         this.prevStation = previous;
     }
 
-    public void setNear(Station[] near){
-        for(int i=0;i < near.length; i++) this.near[i] = near[i];
+    public void setNear(String near){
+        ///
     }
 
     public static Station getKey(Station key) {
